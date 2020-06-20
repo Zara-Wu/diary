@@ -21,15 +21,33 @@ class UserController extends CommonController {
 		if (IS_POST) {
 			//判断验证码
 			$this->checkVerify(I('post.captcha'));
+			$where = array(
+              'user' => $data['user'],
+            );
+            $user = M('member')->where($where)->find();
+            if($user){ //用户存在
+                if($user['password']==md5(I('post.password'))){
+                	session('user',$user);
+					if($_SESSION['url']){
+						header('location:'.$_SESSION['url']);
+					}else{
+						$this->success('登录成功，请稍后',U('Index/index'));//跳转到首页
+					}
+				}else{
+                    $this->error('您输入的密码不正确，请重新输入！');
+                }
+            }else{ //用户不存在
+                $this->error('用户不存在！');
+            }
 			//判断用户名和密码
-			$name = I('post.user','','trim');
-			$pwd = I('post.pwd','','trim');
-			$rst = D('user')->checkUser($name,$pwd);
-			if($rst!==true){
-				$this->error($rst);
-			}
-			$this->success('登录成功，请稍后',U('Index/index'));
-			return;
+//			$name = I('post.user','','trim');
+//			$pwd = I('post.pwd','','trim');
+//			$rst = D('member')->checkUser($name,$pwd);
+//			if($rst!==true){
+//				$this->error($rst);
+//			}
+//			$this->success('登录成功，请稍后',U('Index/index'));
+//			return;
 		}
 		$this->display();
 	}
@@ -42,7 +60,7 @@ class UserController extends CommonController {
 	public function register() {
 		if(IS_POST){
 			$this->checkVerify(I('post.captcha'));
-			$rst = $this->create('user','add');
+			$rst = $this->create('member','add');
 			if($rst===false){
 				$this->error($rst->getError());
 			}
@@ -50,7 +68,7 @@ class UserController extends CommonController {
 			//注册后自动登录
 			$name = I('post.user','','trim');
 			$pwd = I('post.pwd','','trim');
-			D('user')->checkUser($name,$pwd);
+			D('member')->checkUser($name,$pwd);
 			return ;
 		}
 		$this->display();

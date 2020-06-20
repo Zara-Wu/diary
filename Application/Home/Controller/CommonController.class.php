@@ -13,8 +13,8 @@ class CommonController extends Controller {
 	private function checkUser(){
 		if(session('?user_id')){
 			$userinfo = array(
-				'uid' => session('user_id'),       //用户id
-				'user' => session('user_name'),  //用户名
+				'mid' => session('user_id'),       //用户id
+				'mname' => session('user_name'),  //用户名
 			);
 			$this->userInfo = $userinfo;    //保存登录后的信息
 			$this->assign($userinfo);     //为模板分配用户信息变量
